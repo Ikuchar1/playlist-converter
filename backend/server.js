@@ -84,6 +84,42 @@ app.post('/api/scrape', async (req, res) => {
       if (browser) await browser.close();
     }
   });
+
+// POST /api/sync
+app.post('/api/sync', async (req, res) => {
+    const { tracks, playlistName } = req.body;
+    try {
+      // 1) Get current user’s Spotify ID
+      const me = await spotifyApi.getMe();
+      const userId = me.body.id;
+  
+      // 2) Create a new private playlist
+      const created = await spotifyApi.createPlaylist(userId, playlistName || 'Converted Playlist', {
+        public: false,
+      });
+      const playlistId = created.body.id;
+  
+      // 3) Search & collect URIs
+      const uris = [];
+      for (const { title, artist } of tracks) {
+        const result = await spotifyApi.searchTracks(`track:${title} artist:${artist}`, { limit: 1 });
+        if (result.body.tracks.items.length) {
+          uris.push(result.body.tracks.items[0].uri);
+        }
+      }
+  
+      // 4) Add tracks in batches of 100
+      for (let i = 0; i < uris.length; i += 100) {
+        await spotifyApi.addTracksToPlaylist(playlistId, uris.slice(i, i + 100));
+      }
+  
+      res.json({ added: uris.length, total: tracks.length });
+    } catch (err) {
+      console.error('Sync Error:', err);
+      res.status(500).send('Failed to sync to Spotify');
+    }
+  });
+  
   
   
   
