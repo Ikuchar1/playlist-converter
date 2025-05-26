@@ -87,7 +87,16 @@ app.post('/api/scrape', async (req, res) => {
 
 // POST /api/sync
 app.post('/api/sync', async (req, res) => {
-    const { tracks, playlistName } = req.body;
+    const { tracks, playlistName, access_token, refresh_token } = req.body;
+  
+    if (!access_token || !refresh_token) {
+      return res.status(400).send('Missing Spotify access or refresh token');
+    }
+  
+    // Re-hydrate the client for this request
+    spotifyApi.setAccessToken(access_token);
+    spotifyApi.setRefreshToken(refresh_token);
+  
     try {
       // 1) Get current user’s Spotify ID
       const me = await spotifyApi.getMe();
@@ -119,6 +128,7 @@ app.post('/api/sync', async (req, res) => {
       res.status(500).send('Failed to sync to Spotify');
     }
   });
+  
   
   
   
