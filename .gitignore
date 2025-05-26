@@ -1,0 +1,20 @@
+# Node dependencies
+**/node_modules/
+
+# Build outputs
+frontend/dist/
+backend/dist/
+
+# Environment files
+**/.env
+
+# Angular cache & logs
+.frontend/.angular/cache/
+.angular/
+
+# MacOS temp files
+.DS_Store
+
+# IDE files (if you use VSCode, WebStorm, etc.)
+.vscode/
+.idea/
