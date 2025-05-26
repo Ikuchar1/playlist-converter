@@ -1,12 +1,42 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ScrapeService, Track } from './services/scrape.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'playlist-frontend';
+  playlistUrl = '';
+  tracks: Track[] = [];
+  loading = false;
+  error = '';
+
+  constructor(private scrapeService: ScrapeService) {}
+
+  onSubmit() {
+    this.error = '';
+    this.tracks = [];
+    this.loading = true;
+
+    this.scrapeService.scrape(this.playlistUrl).subscribe({
+      next: (data) => {
+        this.tracks = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to scrape playlist';
+        console.error(err);
+        this.loading = false;
+      }
+    });
+  }
 }
