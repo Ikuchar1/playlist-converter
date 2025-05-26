@@ -43,6 +43,10 @@ const spotifyApi = new SpotifyWebApi({
         res.status(500).send('Failed to get tokens');
         }
     });
+
+app.get('/test', (req, res) => {
+    res.send('🎉 Backend is up and running!');
+});
   
   
 
