@@ -1,1 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
+/* styles.scss */
+
+/* Full-screen pastel gradient */
+body,
+html {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+/* Neon-glitch effect */
+@keyframes neon-flicker {
+  0%, 18%, 20%, 22%, 25%, 53%, 100% {
+    text-shadow:
+      0 0 4px #fff,
+      0 0 8px #fff,
+      0 0 16px #f0f,
+      0 0 32px #f0f,
+      0 0 64px #f0;
+  }
+  19%, 21%, 23%, 24%, 54% {
+    text-shadow: none;
+  }
+}
+
+.neon {
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 900;
+  animation: neon-flicker 2s infinite;
+  letter-spacing: 2px;
+}
+

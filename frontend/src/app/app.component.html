@@ -1,32 +1,96 @@
-<div class="p-4 max-w-md mx-auto">
-  <h1 class="text-2xl font-bold mb-4">Playlist Converter (Dev)</h1>
 
-  <form (ngSubmit)="onSubmit()">
-    <label for="url" class="block mb-1">Amazon Music Playlist URL</label>
-    <input
-      id="url"
-      type="text"
-      [(ngModel)]="playlistUrl"
-      name="url"
-      class="w-full p-2 border rounded mb-2"
-      placeholder="https://music.amazon.com/..."
-      required
-    />
 
-    <button
-      type="submit"
-      [disabled]="loading || !playlistUrl"
-      class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-    >
-      {{ loading ? 'Scraping...' : 'Scrape Playlist' }}
-    </button>
-  </form>
 
-  <div *ngIf="error" class="mt-4 text-red-600">{{ error }}</div>
+<!-- Add left/right padding px-6, and ensure top/bottom centering -->
+<div class="flex items-center justify-center min-h-screen p-6 bg-gradient-to-br from-purple-800 to-indigo-900">
 
-  <ul *ngIf="tracks.length" class="mt-4 list-disc pl-5">
-    <li *ngFor="let t of tracks">
-      {{ t.title }} — {{ t.artist }}
-    </li>
-  </ul>
+  <div class="w-full max-w-lg bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl p-8 space-y-6 border border-white/30">
+
+    <!-- Glitchy Neon Title -->
+    <div class="text-center">
+      <h1 class="neon">PLAYLIST CONVERTER</h1>
+    </div>
+
+    <div class="flex items-center justify-center h-full p-4">
+      <div class="max-w-md w-full bg-white/30 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6 border border-white/40">
+
+        <!-- Logo & Title -->
+        <div class="text-center">
+
+          <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">
+            Playlist Converter
+          </h1>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-white/50 p-4 rounded-xl border border-white/40 space-y-2">
+          <h2 class="font-semibold text-xl text-purple-900">How it works</h2>
+          <ol class="list-decimal list-inside text-purple-800 text-sm space-y-1">
+            <li>Drag “Export Amazon CSV” into your bookmarks bar.</li>
+            <li>Open your Amazon Music playlist, scroll to load all songs, click that bookmark.</li>
+            <li>Download <code>playlist.csv</code> automatically.</li>
+            <li>Drag &amp; drop it below or click “Select CSV.”</li>
+            <li>See your tracks—then sync to Spotify!</li>
+          </ol>
+        </div>
+
+        <!-- Bookmarklet -->
+        <div class="text-center">
+          <a
+            href="javascript:(()=>{/* bookmarklet code */})();"
+            title="Drag into bookmarks"
+            class="px-5 py-3 bg-indigo-600 text-white font-medium rounded-full shadow-lg hover:bg-indigo-700 transition"
+          >
+            Export Amazon CSV
+          </a>
+        </div>
+
+        <!-- File Drop Zone -->
+        <div
+          class="relative flex flex-col items-center justify-center p-8 border-4 border-dashed rounded-2xl transition-colors"
+          [class.border-indigo-500]="dragging"
+          (drop)="onFile($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          style="background: rgba(255,255,255,0.25);"
+        >
+          <p class="text-xl text-white mb-2">📂 Drop CSV here</p>
+          <p class="text-sm text-white/80 mb-4">or</p>
+          <button
+            (click)="fileInput.click()"
+            class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow hover:bg-indigo-700 transition"
+          >
+            Select CSV File
+          </button>
+          <input
+            #fileInput
+            type="file"
+            accept=".csv"
+            (change)="onFile($event)"
+            class="hidden"
+          />
+        </div>
+
+        <!-- Parsed Tracks -->
+        <div *ngIf="tracks.length" class="space-y-4">
+          <h2 class="text-2xl font-bold text-white drop-shadow">Tracks</h2>
+          <ul class="space-y-2 max-h-64 overflow-auto scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-white/20">
+            <li
+              *ngFor="let t of tracks"
+              class="flex justify-between items-center p-3 bg-white/50 rounded-xl shadow-inner"
+            >
+              <span class="font-medium text-indigo-900">{{ t.title }}</span>
+              <span class="text-indigo-700">{{ t.artist }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="text-red-100 text-center bg-red-600/50 p-2 rounded">
+          {{ error }}
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

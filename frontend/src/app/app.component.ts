@@ -1,42 +1,61 @@
 import { Component } from '@angular/core';
-import { ScrapeService, Track } from './services/scrape.service';
+import * as Papa from 'papaparse';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  playlistUrl = '';
-  tracks: Track[] = [];
-  loading = false;
+  tracks: { title: string; artist: string }[] = [];
   error = '';
+  dragging = false;
 
-  constructor(private scrapeService: ScrapeService) {}
+  // Prevent browser default and mark dragging state
+  onDragOver(evt: DragEvent) {
+    evt.preventDefault();
+    this.dragging = true;
+  }
+  onDragLeave(evt: DragEvent) {
+    evt.preventDefault();
+    this.dragging = false;
+  }
 
-  onSubmit() {
+  // Handle both drop and file-picker events
+  onFile(event: Event | DragEvent) {
+    event.preventDefault();
+    this.dragging = false;
     this.error = '';
     this.tracks = [];
-    this.loading = true;
 
-    this.scrapeService.scrape(this.playlistUrl).subscribe({
-      next: (data) => {
-        this.tracks = data;
-        this.loading = false;
+    let file: File | null = null;
+    if (event instanceof DragEvent) {
+      file = event.dataTransfer?.files.item(0) || null;
+    } else {
+      const inp = event.target as HTMLInputElement;
+      file = inp.files?.item(0) || null;
+    }
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (res: Papa.ParseResult<any>) => {
+        this.tracks = res.data
+          .map(r => ({
+            title: r.title?.trim() || '',
+            artist: r.artist?.trim() || '',
+          }))
+          .filter(t => t.title && t.artist);
       },
-      error: (err) => {
-        this.error = 'Failed to scrape playlist';
+      error: (err: any) => {
         console.error(err);
-        this.loading = false;
-      }
+        this.error = 'Failed to parse CSV file.';
+      },
     });
   }
 }
