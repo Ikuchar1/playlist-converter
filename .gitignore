@@ -9,8 +9,8 @@ backend/dist/
 **/.env
 
 # Angular cache & logs
-.frontend/.angular/cache/
 .angular/
+frontend/.angular/cache/
 
 # MacOS temp files
 .DS_Store
